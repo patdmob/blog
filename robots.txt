@@ -1,1 +1,1 @@
-Sitemap: https://patdmob.github.io/sitemap.xml
+Sitemap: https://patdmob.github.io/blog/sitemap.xml

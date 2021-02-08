@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Missing Data Modeled | Patrick D Mobley</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Missing Data Modeled" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world." />
+<meta property="og:description" content="Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world." />
+<link rel="canonical" href="https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html" />
+<meta property="og:url" content="https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html" />
+<meta property="og:site_name" content="Patrick D Mobley" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-07-15T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html","@type":"BlogPosting","headline":"Missing Data Modeled","dateModified":"2018-07-15T00:00:00-05:00","datePublished":"2018-07-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html"},"description":"Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://patdmob.github.io/blog/feed.xml" title="Patrick D Mobley" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">Patrick D Mobley</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Missing Data Modeled</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2018-07-15T00:00:00-05:00" itemprop="datePublished">
+        Jul 15, 2018
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      15 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#tutorial">tutorial</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#missing data">missing data</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#R programming">R programming</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="outline">Outline</h2>
+
+<p><a href="#introduction">Introduction</a> <br /> <a href="#example-data">Example data</a> <br /> <a href="#understanding-the-problem-defining-success">Understanding the problem &amp; defining success</a> <br /> <a href="#investigating-missingness">Investigating missingness</a> <br /> <a href="#methods-to-deal-with-missing-data">Methods to deal with missing data</a> <br /> <a href="#missing-data-packages-in-r">Missing data packages in R</a> <br /> <a href="#conclusion">Conclusion</a> <br /> <a href="#resources">Resources</a> <br /></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world.</p>
+
+<p>Unfortunately, we can’t leave these decisions to algorithms. Most learners simply drop any records with missing data. And models that “support” missing data often only perform basic mean/mode imputation. These common but naive approaches to missingness can erode the data leaving it underpowered and/or biased–unable to answer intended questions. Fortunately, missing data analysis has provided us with a framework to overcome these challenges.</p>
+
+<p>In this notebook, I provide an overview to missing data analysis. After reading this, you should have a solid understanding of the problem, considerations, and techniques relevant for missing data analysis.</p>
+
+<h2 id="example-data">Example data</h2>
+
+<p>Admittedly, the iris dataset is overused. But the data isn’t the point. It’s just a vehicle to get where we’re going. In case you haven’t interacted with the Iris dataset before:</p>
+
+<h5 id="iris-dataset">Iris Dataset</h5>
+
+<p>There are three types of iris flowers, each with measurements for sepal length, sepal width, petal length, and petal width.</p>
+
+<ul>
+  <li>Setosa</li>
+  <li>Versicolour</li>
+  <li>Virginica</li>
+</ul>
+
+<p>The dataset contains 50 observations for each flower.</p>
+
+<h2 id="understanding-the-problem--defining-success">Understanding the problem &amp; defining success</h2>
+
+<p>Depending on your experience, you may already understand why missing data is a problem. However, let me formally define the problem and state a few goals which define success.</p>
+
+<h3 id="loss-of-power">Loss of power</h3>
+
+<p>Statistical power refers to the amount of data required to reliably make a statistical claim. Simply said, missing data results in less usable data. Occasionally we have data to spare, but even small amounts of missing data can drastically reduce the size of usable data. In many fields, data collection is extremely costly and sometimes cannot be replicated.</p>
+
+<p>If we randomly drop 6% of values, then a sample of the Iris dataset might look like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Sepal.Length Sepal.Width Petal.Length Petal.Width Species
+1          5.1         3.5          1.4         0.2  setosa
+2          4.9         3.0           NA         0.2  setosa
+3           NA         3.2          1.3         0.2    &lt;NA&gt;
+4          4.6         3.1          1.5         0.2  setosa
+5          5.0         3.6          1.4         0.2  setosa
+6          5.4         3.9          1.7         0.4  setosa
+</code></pre></div></div>
+
+<p>Most models require complete data (no missing values) from which to learn. After removing rows with missing data, we only have 113 out of 150 complete rows. Therefore, even small amounts of missing data (6%) can result in large data loss (24.7%) from a modeling perspective. Generally, a good solution to missing data will maximize available data.</p>
+
+<h3 id="bias">Bias</h3>
+
+<p>The second way missing data impacts a dataset is through bias. Consider the following chart. In this case, random elements were dropped from the data if petal length was less than 3.0. Perhaps the data collector had an unconscious bias against short petal iris flowers.</p>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-4-1.png" alt="" /></p>
+
+<p>At first glance, the available case distribution looks similar to the real data. But a common mistake in exploratory data analysis is to consider each variable individually and not compare this to what the model actually uses. If there is a pattern to the missingness, complete-case (only using complete rows) modeling will result in a biased model. At this point we need to ask ourselves why the data is missing. There can be multiple reasons which may require different strategies to address.</p>
+
+<p>If we can successfully rule out any patterns to the missingness, then we can assume it is Missing Completely at Random (MCAR). The following chart shows data that is MCAR.</p>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-5-1.png" alt="" /></p>
+
+<p>Notice, even though the sample size decreases, the general distribution remains the same. If the data is MCAR, then bias is not a concern; however data is rarely MCAR. Regardless, a good solution for missing data will seek to make bias as small as possible.</p>
+
+<h3 id="estimating-uncertainty">Estimating uncertainty</h3>
+
+<p>Any method we use will change the shape of the data. Ideally, this altered shape should resemble the real data as closely as possible. But exactly how close is it? Much of statistics is primarily concerned about two things: estimating the magnitude of a statistic (mean, median, variance, etc.) and the probability/likelihood of occurrence. If we replace missing values with an estimate, how do we account for the variability in that estimate? Said differently, how confident are we that our estimates are accurate?</p>
+
+<p>For this reason, advanced techniques like Multiple Imputations using Chained Equations (MICE) give a distribution of potential values. This provides an excellent way to correct estimates of uncertainty. However, it also makes modeling more complicated and is not appropriate for all applications. Even so, we should strive for accurate estimates of uncertainty (standard errors, confidence intervals, p-values, etc.).</p>
+
+<h3 id="goals-for-missing-data-analysis">Goals for Missing Data Analysis</h3>
+
+<p>To summarize, our goals<sup id="a1"><a href="#f1">1</a></sup> are to:</p>
+
+<ol>
+  <li>Maximize the use of available information. <br /></li>
+  <li>Minimize bias. <br /></li>
+  <li>Yield good estimates of uncertainty. <br /></li>
+</ol>
+
+<p>These goals define success for our missing data problem. Of course, we must also balance these goals against any technical constraints of our project. For instance, streaming analytics will need computationally efficient methods which might not ideally solve the missing data but still provide a good enough proximity for the application. If this happens, it’s important to document these model limitations.</p>
+
+<h2 id="investigating-missingness">Investigating missingness</h2>
+
+<p>It’s important to understand why the data is missing. This could mean one or even multiple reasons. This will help us to choose an appropriate method and avoid biasing our dataset.</p>
+
+<h3 id="consider-how-the-data-was-collected">Consider how the data was collected</h3>
+
+<p>By understanding more about the data collection process, you’re able to discover potential reasons why data might be missing.</p>
+
+<p>For instance, survey data commonly has missing data. Questions might be confusing or entice people to lie. A good solution for this is to interview a subset of respondents and understand their thought process. Perhaps this subset just didn’t know how to interpret the question.</p>
+
+<p>Depending on the environment, there might be regular events which impact the data. Monthly power generator tests may briefly shut down computers collecting data. By talking with building management, you can get a schedule of events which may impact your data.</p>
+
+<p>Regardless of the cause, understanding how the data was collected, its consistency, environment, etc. all help you to understand potential sources bias and missing data.</p>
+
+<h3 id="visualizing-the-problem">Visualizing the problem</h3>
+
+<p>It is common in Exploratory Data Analysis (EDA) to only visualize what is there, forgetting about what is not. Actually, much of missing data analysis is part of EDA. But how do you visualize what is not there? You look at the pattern!</p>
+
+<p>Here I’ve used a packaged called <code class="language-plaintext highlighter-rouge">VIM</code> to visualize the missingness pattern:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#install.packages("VIM")</span><span class="w">
+</span><span class="n">require</span><span class="p">(</span><span class="n">VIM</span><span class="p">)</span><span class="w">
+</span><span class="n">aggr</span><span class="p">(</span><span class="n">iris_mis</span><span class="p">,</span><span class="w"> </span><span class="n">col</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s1">'darkred'</span><span class="p">,</span><span class="s1">'slategrey'</span><span class="p">),</span><span class="n">numbers</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="n">sortVars</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span><span class="w">
+    </span><span class="n">labels</span><span class="o">=</span><span class="nf">names</span><span class="p">(</span><span class="n">iris_mis2</span><span class="p">),</span><span class="n">cex.axis</span><span class="o">=</span><span class="m">.8</span><span class="p">,</span><span class="n">gap</span><span class="o">=</span><span class="m">3</span><span class="p">,</span><span class="n">ylab</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"Proportion of Missing Data"</span><span class="p">,</span><span class="s2">"Pattern"</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-6-1.png" alt="" /></p>
+
+<p>On the left, we have a bar chart showing the proportion of missing data for each variable. And on the right, we have can see the pattern of missingness for each combination of variables. For instance, 75.3% of the data is complete with no missing values.</p>
+
+<p>When visualizing missing data, think about why it might be missing missing and how you plan on using the data in a model. Is a variable with high missingness necessary for the model? Will dropping observations with high missingness induce bias or critically impact power? What is the most/least common missingness pattern? Are there any missingness dependencies between variables (e.g. are two variables are always missing together)?</p>
+
+<p>You can also look at any correlations between missing and present data. If we looked at a data set of heights and weights, perhaps taller individuals were more likely to have missing weight. If so, visualizing the histogram of height by missing weight frequency may reveal an interesting pattern.</p>
+
+<h3 id="three-types-of-missing-data">Three types of missing data</h3>
+
+<p>While researching the data collection process and performing EDA, it helps to understand the three types of missing data. Each type has different implications. To illustrate, imagine that you’re a field investigator collecting household surveys to understand the labor market.</p>
+
+<h5 id="mcar---missing-completely-at-random">MCAR - Missing Completely At Random</h5>
+
+<p>You have just finished collecting surveys. On your way back to the office, a stack of surveys take flight on a gust of wind. As you scramble to catch them, some of the responses are obscured.</p>
+
+<p>This is a case of Missing Completely At Random (MCAR). We know this because an unrelated outside event resulted in missing data. In other words, the cause of missingness is unrelated to the data. The wind doesn’t care which answers are obscured. It was a completely random accident.</p>
+
+<p>If your data is MCAR, great! It’s the easiest of all missingness to handle. MCAR is un-biased missing data. Simple statistic imputation (mean, median, mode, etc.) is a perfectly legitimate method when your data is MCAR. If you have enough data, deleting rows with missingness (complete-case analysis) is also an option. Unfortunately, MCAR is the least common form of missing data.</p>
+
+<h5 id="mar---missing-at-random">MAR - Missing At Random</h5>
+
+<p>After entering the data and exploratory data analysis, you realize that an occupational subgroup has a high rate of missingness concerning their income (e.g. perhaps attorneys prefer not to disclose their income). While not ideal, this missingness is manageable since you are able to use other variables to tease out their likely income. In other words, the missingness is biased in some way explainable by the data.</p>
+
+<p>This type of missingness is considered to be Missing At Random (MAR). Ironically, this is not the best name since it is really conditionally missing at random. But it’s historical so it stuck.</p>
+
+<h5 id="mnar---missing-not-at-random">MNAR - Missing Not At Random</h5>
+
+<p>Lastly, suppose larger households omit the number of people living in the household. In this case, the reason for missingness depends on the missing values themselves and not on other variables for which we have information. Another case of MNAR would be if an unmeasured 3rd party is trying to influence the data.</p>
+
+<p>This kind of missingness is considered Missing Not At Random (MNAR). MNAR is bias unexplained by current data. Unfortunately this kind of missingness is difficult to test for or solve. Sometimes the best way to overcome MNAR is by collecting additional information.</p>
+
+<h5 id="difference-between-mar-and-mnar">Difference between MAR and MNAR</h5>
+
+<p>One way to think about the difference between MAR and MNAR missingness is based on available information. Let’s say that we have a dataset with only one variable: Income. If income is missing for given observations, we have no other information from which to make an educated guess. This is MNAR. However, if we collect Occupation, Employed, Education, Age, Experience, etc. we might be able to make a much better guess at income. Now the missing data is MAR. The key difference is whether the bias can be explained by the current data.</p>
+
+<h2 id="methods-to-deal-with-missing-data">Methods to deal with missing data</h2>
+
+<h3 id="consider">Consider</h3>
+
+<p>Three things to consider when choosing a method for handling missing data:</p>
+
+<ul>
+  <li>What is the type and cause of missingness?
+    <ul>
+      <li>MCAR, MAR, or MNAR</li>
+      <li>Likely cause(s)</li>
+    </ul>
+  </li>
+  <li>What is the shape of the data?
+    <ul>
+      <li>Ordinal, nominal, continuous, discrete, time series, panel etc.</li>
+      <li>What does the distribution look like?</li>
+    </ul>
+  </li>
+  <li>What are my constraints?
+    <ul>
+      <li>Sample size (too large, too small)</li>
+      <li>Streaming or batch</li>
+      <li>Training time</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Each method makes different assumptions or is optimized for a particular type of data. Choose the method that fits your data type and problem best. You will likely need to learn a few different methods to handle various types of data. More complicated algorithms like Multiple Imputation using Chained Equations (MICE) or Maximum Likelihood can be complicated to set up and may take too much computation for a given application.</p>
+
+<h3 id="methods">Methods</h3>
+
+<p>I’ve listed methods below in order of least to most complicated. For each variable with missingness, consider the methods at the top first. However, if you are conserned about power and bias, then you’ll need to adopt more complicated methods. Finally, if you have many variables with missingness, you may need to use a specialized algorithm which performs multiple imputation.</p>
+
+<p>Note: Here I make the distinction between replacement, interpolation, and imputation, however they are all forms of imputation (i.e replacing a missing value with an estimated value).</p>
+
+<ul>
+  <li>Deletion
+    <ul>
+      <li>List-wise (complete-case analysis)</li>
+      <li>Pair-wise (available-case analysis)</li>
+      <li>Observations or variables with too little information to be useful <br /><br /></li>
+    </ul>
+  </li>
+  <li>Replacement
+    <ul>
+      <li>Static value: mean, median, mode, constant, zeros, “missing” for categorical variables</li>
+      <li>Dynamic value: logical rules, LVCF, hot-deck, cold-deck, random<br /><br /></li>
+    </ul>
+  </li>
+  <li>Interpolation
+    <ul>
+      <li>Appropriate for data following a predictable pattern (1, 2, ?, 4, 5…)</li>
+      <li>Common for time-series or spatial data <br /><br /></li>
+    </ul>
+  </li>
+  <li>Missingness Indicator
+    <ul>
+      <li>Indicator variable to denote a replaced/interpolated/imputed missing value. This assumes there is a unobserved reason/pattern for missingness, and if not can induce bias <br /><br /></li>
+    </ul>
+  </li>
+  <li>Imputation
+    <ul>
+      <li>Single imputation uses other features to predict/approximate the correct value of one variable. In reality, this can be any common model used by predicting the missing values (e.g. regression, knn, etc.).</li>
+      <li>Multiple imputation imputes multiple variables at the same time. The rational being if multiple variables have biased missingness, then imputing one variable on others would result in biased imputation. These are usually specialized missing data models which iterate over each variable with missingness until convergence (e.g. MICE, Maximum Likelihood, missForest, etc.). <br /><br /></li>
+    </ul>
+  </li>
+  <li>Combination</li>
+</ul>
+
+<p>Occationally, it makes sense to use create a missingness indicator for select variables. Let’s suppose that variable <em>x</em>’s missingness likely represents a group uncaptured by other variables. Then we should create a missingness indicator for variable <em>x</em> and impute missing values for <em>x</em>.</p>
+
+<p>A dataset will probably require multiple methods. It is common to drop a variable with lots of missingness, then interpolate a date field, before performing multiple imputation on the rest.</p>
+
+<h4 id="keep-in-mind">Keep in Mind</h4>
+
+<blockquote>
+  <p>All models are wrong, but some are useful</p>
+</blockquote>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  — famed statistician George Box
+</code></pre></div></div>
+
+<p>Your solution to missing data is just a model. It’s wrong, but it can be useful. Don’t take it too seriously, but know that it is important.</p>
+
+<h2 id="missing-data-packages-in-r">Missing data packages in R</h2>
+
+<p>This is by no means an exhaustive list, but these packages are fairly popular.</p>
+
+<ul>
+  <li>Imputation
+    <ul>
+      <li><a href="https://cran.r-project.org/web/packages/Hmisc/Hmisc.pdf">Hmisc</a> - General package with functions for single and multiple imputation</li>
+      <li><a href="https://stat.ethz.ch/education/semesters/ss2013/ams/paper/missForest_1.2.pdf">missForest</a> - Muliple Imputation based on Random Forest algorithm</li>
+      <li><a href="https://www.jstatsoft.org/index.php/jss/article/view/v045i03/v45i03.pdf">MICE</a> - Muliple Imputation using Chained Equations</li>
+      <li><a href="https://cran.r-project.org/web/packages/Amelia/vignettes/amelia.pdf">Amelia</a> - Imputation for time series data <br /> <br /></li>
+    </ul>
+  </li>
+  <li>Tools and visualization
+    <ul>
+      <li><a href="https://cran.r-project.org/web/packages/mitools/mitools.pdf">mitools</a> - Tools for multiple imputation of missing data</li>
+      <li><a href="https://cran.r-project.org/web/packages/VIMGUI/vignettes/VIM-Imputation.pdf">VIM</a> - Visualization and Imputation of Missing values</li>
+    </ul>
+  </li>
+</ul>
+
+<p>In the following examples, we’ll use the biased Iris dataset (random elements were dropped if petal length was less than 3.0).</p>
+
+<h3 id="example-in-hmisc">Example in Hmisc</h3>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#install.packages("Hmisc")</span><span class="w">
+</span><span class="n">require</span><span class="p">(</span><span class="n">Hmisc</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">impute()</code> function replaces the missing value with user defined statistical method (default=median</td>
+      <td>mean</td>
+      <td>max etc.)</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">iris_mis</span><span class="o">$</span><span class="n">imputed.Petal.Length</span><span class="w"> </span><span class="o">&lt;-</span><span class="w">
+              </span><span class="n">with</span><span class="p">(</span><span class="n">iris_mis</span><span class="p">,</span><span class="w"> </span><span class="n">impute</span><span class="p">(</span><span class="n">Petal.Length</span><span class="p">,</span><span class="w"> </span><span class="n">mean</span><span class="p">))</span><span class="w">
+</span><span class="n">iris_mis</span><span class="o">$</span><span class="n">imputed.Petal.Width</span><span class="w"> </span><span class="o">&lt;-</span><span class="w">
+              </span><span class="n">with</span><span class="p">(</span><span class="n">iris_mis</span><span class="p">,</span><span class="w"> </span><span class="n">impute</span><span class="p">(</span><span class="n">Petal.Width</span><span class="p">,</span><span class="w"> </span><span class="n">mean</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>However, as we can see below, using mean imputation increases the bias making it difficult to identify Setosa, the species with the smallest petal length.</p>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-9-1.png" alt="" /></p>
+
+<p>For this reason, you should use more advanced methods when dealing with biased missing data. Even unbiased data will benefit depending on your choice of analytic model (decision trees are probably more affected by mean imputation than linear regression).</p>
+
+<p><code class="language-plaintext highlighter-rouge">aregImpute()</code> function creates multiple imputations using additive regression, bootstrapping, and predictive mean matching.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">imputed_aregImpute</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">aregImpute</span><span class="p">(</span><span class="o">~</span><span class="w"> </span><span class="n">Sepal.Length</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Sepal.Width</span><span class="w">
+                        </span><span class="o">+</span><span class="w"> </span><span class="n">Petal.Length</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Petal.Width</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Species</span><span class="p">,</span><span class="w">
+                        </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iris_mis</span><span class="p">,</span><span class="w"> </span><span class="n">n.impute</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>5 separate imputations to yield good estimates of uncertainty. The literature suggests 20 or more imputations.</p>
+
+<p>But for now, we want to pool those imputations to graph the results.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">imputed</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">as.data.frame</span><span class="p">(</span><span class="n">impute.transcan</span><span class="p">(</span><span class="n">imputed_aregImpute</span><span class="p">,</span><span class="w">
+                           </span><span class="n">imputation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iris_mis</span><span class="p">,</span><span class="w">
+                           </span><span class="n">list.out</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w"> </span><span class="n">pr</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">,</span><span class="w"> </span><span class="n">check</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Here, muliple imputation does a much better job at matching the shape of the original data.</p>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-12-1.png" alt="" /></p>
+
+<h3 id="example-in-mice">Example in MICE</h3>
+
+<p>MICE stands for Multivariate Imputation using Chained Equations</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#install.packages("mice")</span><span class="w">
+</span><span class="n">require</span><span class="p">(</span><span class="n">mice</span><span class="p">)</span><span class="w">
+</span><span class="n">imputed_mice</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mice</span><span class="p">(</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">iris_mis</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">],</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w">
+                  </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"pmm"</span><span class="p">,</span><span class="w"> </span><span class="n">maxit</span><span class="o">=</span><span class="m">50</span><span class="p">,</span><span class="w"> </span><span class="n">seed</span><span class="o">=</span><span class="m">500</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>It is one of the more complicated methods, however it does a great job of imputing missing variables.</p>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-14-1.png" alt="" /></p>
+
+<h3 id="example-in-missforest">Example in missForest</h3>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#install.packages("missForest")</span><span class="w">
+</span><span class="n">require</span><span class="p">(</span><span class="n">missForest</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>missForest is a relatively newer imputation algorithm and uses an iterative random forest approach to missing data. It accomplishes this by estimating the accuracy of these predictions and adjusts the model. You can also run it in parallel when installing the package doParallel.</p>
+
+<p>Imputing with missForest:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#install.packages("doParallel")</span><span class="w">
+</span><span class="n">require</span><span class="p">(</span><span class="n">doParallel</span><span class="p">)</span><span class="w">
+</span><span class="n">registerDoParallel</span><span class="p">()</span><span class="w">                    </span><span class="c1">#registering the processor</span><span class="w">
+</span><span class="n">getDoParWorkers</span><span class="p">()</span><span class="w">                       </span><span class="c1">#number of processors running</span><span class="w">
+</span><span class="c1">#vignette("gettingstartedParallel")     #for more information</span><span class="w">
+</span><span class="n">imputed_forest</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">missForest</span><span class="p">(</span><span class="n">iris_mis</span><span class="p">[</span><span class="m">1</span><span class="o">:</span><span class="m">5</span><span class="p">],</span><span class="w"> </span><span class="n">parallelize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"forest"</span><span class="p">)</span><span class="w">
+</span><span class="n">imputed_forest</span><span class="o">$</span><span class="n">OOBerror</span><span class="w">                 </span><span class="c1">#calling Out Of Bag error</span><span class="w">
+</span><span class="n">iris_mis.forest</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">imputed_forest</span><span class="o">$</span><span class="n">ximp</span><span class="w">
+</span></code></pre></div></div>
+
+<p>As you can see, it also does quite well.</p>
+
+<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-17-1.png" alt="" /></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>While often overlooked, missing data analysis plays an important role in the modeling process. Common but naive approaches often leave datasets underpowered or biased which could impact real-world model performance.</p>
+
+<p>Missing data analysis is conscerned with making the best use of availible information while minimizing bias and maintaining accurate estimates of uncertainty. To do this, it is important to understand the type of and causes for missingness. We also need to balance the goals of success with the technical constraints of the problem. Afterward, a reasonable approach to handle missing data often becomes clear.</p>
+
+<p>There are a variety of methods developed to overcome the problem of missing data. This article highlights a few of them. As this is a growing field, new methods constantly appear.</p>
+
+<h2 id="resources">Resources</h2>
+
+<p>This notebook:</p>
+
+<p><a href="https://github.com/patdmob/Missing-Data">https://github.com/patdmob/Missing-Data</a></p>
+
+<p>Articles:</p>
+
+<p><a href="http://www.analyticsvidhya.com/blog/2016/03/tutorial-powerful-packages-imputing-missing-values/">http://www.analyticsvidhya.com/blog/2016/03/tutorial-powerful-packages-imputing-missing-values/</a></p>
+
+<p><a href="http://www.analyticsvidhya.com/blog/2016/01/guide-data-exploration/">http://www.analyticsvidhya.com/blog/2016/01/guide-data-exploration/</a></p>
+
+<p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3074241/">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3074241/</a></p>
+
+<p>Chapters:</p>
+
+<p><a href="http://www.statisticalhorizons.com/wp-content/uploads/2012/01/Milsap-Allison.pdf">http://www.statisticalhorizons.com/wp-content/uploads/2012/01/Milsap-Allison.pdf</a></p>
+
+<h2 id="footnotes">Footnotes</h2>
+
+<p><b id="f1">1</b> These goals are adopted from Paul Allison’s chapter on missing data referenced in the <a href="#resources">resources</a> section. <a href="#a1">↩</a></p>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="patdmob/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/patdmob" title="patdmob"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/patrickdmobley" title="patrickdmobley"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/patdmob" title="patdmob"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

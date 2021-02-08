@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "Missing Data Modeled"
+description: By creating a missing data model, you can understand the underlying assumptions of your data.
 categories: [tutorial, missing data, R programming]
-excerpt: Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world.
 comments: true
 ---
 
@@ -60,13 +60,13 @@ Most models require complete data (no missing values) from which to learn. After
 
 The second way missing data impacts a dataset is through bias. Consider the following chart. In this case, random elements were dropped from the data if petal length was less than 3.0. Perhaps the data collector had an unconscious bias against short petal iris flowers.
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-4-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-4-1.png)
 
 At first glance, the available case distribution looks similar to the real data. But a common mistake in exploratory data analysis is to consider each variable individually and not compare this to what the model actually uses. If there is a pattern to the missingness, complete-case (only using complete rows) modeling will result in a biased model. At this point we need to ask ourselves why the data is missing. There can be multiple reasons which may require different strategies to address.
 
 If we can successfully rule out any patterns to the missingness, then we can assume it is Missing Completely at Random (MCAR). The following chart shows data that is MCAR.
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-5-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-5-1.png)
 
 Notice, even though the sample size decreases, the general distribution remains the same. If the data is MCAR, then bias is not a concern; however data is rarely MCAR. Regardless, a good solution for missing data will seek to make bias as small as possible.
 
@@ -114,7 +114,7 @@ aggr(iris_mis, col=c('darkred','slategrey'),numbers=TRUE,sortVars=TRUE,
     labels=names(iris_mis2),cex.axis=.8,gap=3,ylab=c("Proportion of Missing Data","Pattern"))
 ```
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-6-1.png)
 
 On the left, we have a bar chart showing the proportion of missing data for each variable. And on the right, we have can see the pattern of missingness for each combination of variables. For instance, 75.3% of the data is complete with no missing values.
 
@@ -239,7 +239,7 @@ iris_mis$imputed.Petal.Width <-
 
 However, as we can see below, using mean imputation increases the bias making it difficult to identify Setosa, the species with the smallest petal length.
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 For this reason, you should use more advanced methods when dealing with biased missing data. Even unbiased data will benefit depending on your choice of analytic model (decision trees are probably more affected by mean imputation than linear regression).
 
@@ -263,7 +263,7 @@ imputed <- as.data.frame(impute.transcan(imputed_aregImpute,
 
 Here, muliple imputation does a much better job at matching the shape of the original data.
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 ### Example in MICE
 
@@ -278,7 +278,7 @@ imputed_mice <- mice(data = iris_mis[1:5], m = 5,
 
 It is one of the more complicated methods, however it does a great job of imputing missing variables.
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-14-1.png)
 
 ### Example in missForest
 
@@ -304,7 +304,7 @@ iris_mis.forest <- imputed_forest$ximp
 
 As you can see, it also does quite well.
 
-![](/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-17-1.png)
+![](/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
 Conclusion
 ----------

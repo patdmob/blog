@@ -18,7 +18,7 @@ My project directory contains the .bat file and separate folders for data and th
 
 The directory looks like this: 
 
-![](/images/Taking_a_bat_to_scripts_files/image002.png)
+![]({{ site.baseurl }}/images/Taking_a_bat_to_scripts_files/image002.png)
 
 In the R script, I reference a file in the data folder. 
 
@@ -71,7 +71,7 @@ exit
 
 Here were my results:
 
-![](/images/Taking_a_bat_to_scripts_files/image001.png)
+![]({{ site.baseurl }}/images/Taking_a_bat_to_scripts_files/image001.png)
 
 As you can see, I called the .bat file from my user profile directory. The first attempt fails but the second is a success. By using this second method, a user can flexibly execute the .bat file by double clicking, navigating from the cmd prompt, or using the task scheduler. 
 

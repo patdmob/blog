@@ -1,12 +1,8 @@
 ---
 layout: post
 title: "Imbalanced Classification with mlr"
-categories:
-  - Tutorials
-tags:
-  - imbalanced classification
-  - R programming
-excerpt: This notebook presents a reference implementation of an imbalanced data problem, namely predicting employee attrition. We'll use mlr, a package designed to provide an infrastructure for Machine Learning in R. Additionally, there is a companion post which investigates the effectiveness of SMOTE compared to non-SMOTE models.
+description: "This notebook is a tutorial on using <em>mlr</em> to solve an imbalanced data problem: predicting employee attrition."
+categories: [tutorial, imbalanced classification, R programming]
 comments: true
 ---
 
@@ -148,7 +144,7 @@ lrns <- list(
 
 #### Pause: Let's review the process flow
 
-![](/assets/Imbalanced_Classification_with_mlr_files/Employee%20Attrition%20Model.png)
+![]({{ site.baseurl }}/images/Imbalanced_Classification_with_mlr_files/Employee%20Attrition%20Model.png)
 
 The order of operations is important. If you SMOTE before splitting the data, then you've effectively polluted the training set with information from the test set! `mlr` has a `smote()` function, but that works by redefining the task and will happen before the resampling split. Therefore, we wrapped the smote around the learner which is applied after the resampling split.
 
@@ -190,7 +186,7 @@ Shown below are boxplots showing the performance measure distribution for each o
 plotBMRBoxplots(bchmk, measure = acc)
 ```
 
-![](/assets/Imbalanced_Classification_with_mlr_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![]({{ site.baseurl }}/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-8-1.png)
 
 However when we look at balanced accuracy, we see a performance drop. Balanced accuracy gives equal weight to the relative proportion of each class (left vs stayed) resulting in a more difficult metric.
 
@@ -198,7 +194,7 @@ However when we look at balanced accuracy, we see a performance drop. Balanced a
 plotBMRBoxplots(bchmk, measure = bac)
 ```
 
-![](/assets/Imbalanced_Classification_with_mlr_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![]({{ site.baseurl }}/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-9-1.png)
 
 With this we've built some models, but now we need to refine them. Let's see if we can improve performance by tuning the hyperparameters.
 
@@ -277,7 +273,7 @@ df_4wk <- generateThreshVsPerfData(bchmk,
 plotROCCurves(df_4wk) + ggtitle("Four week attrition model ROC curves")
 ```
 
-![](/assets/Imbalanced_Classification_with_mlr_files/figure-markdown_github/unnamed-chunk-12-1.png)
+![]({{ site.baseurl }}/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-12-1.png)
 
 Right now, we are testing the model against the holdout. But after we finish modeling, we'll train a model using all the data. To understand how well the model integrates new data, we'll create the learning curve for various measures of performance.
 
@@ -297,7 +293,7 @@ plotLearningCurve(lc_4wk, facet.wrap.ncol = 2) +
   ggtitle("Four week prediction learning curve")
 ```
 
-![](/assets/Imbalanced_Classification_with_mlr_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![]({{ site.baseurl }}/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-14-1.png)
 
 These plots show that the model may benefit from additional data but with decreasing marginal gains. If we want better performance, more data will only help so much--we'll need better features.
 

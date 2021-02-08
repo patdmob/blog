@@ -1,12 +1,8 @@
 ---
 layout: post
 title: "Vanilla vs SMOTE Flavored Imbalanced Classification"
-categories:
-  - Tutorials
-tags:
-  - imbalanced classification
-  - R programming
-excerpt: This is a companion notebook to Imbalanced Classification with mlr. In this notebook, we investigate whether SMOTE actually improves model performance. For clarity, non-SMOTE models are referred to as "vanilla" models. We compare these two flavors (vanilla and SMOTE) using logistic regression, decision trees, and randomForest. We also consider how tuning model operating thresholds and tuning SMOTE parameters impact the results.
+description: A companion notebook to Imbalanced Classification with mlr, here we compare non-SMOTE and SMOTE modeling using logistic regression, decision trees, and randomForest.
+categories: [tutorial, imbalanced classification, R programming]
 comments: true
 ---
 
@@ -41,23 +37,23 @@ There are lots of performance measures to choose from for classification problem
 
 is the percentage of correctly classified instances. However, if the majority class makes up 99% of the data, then it is easy to get an accuracy of 99% by always predicting the majority class. For this reason, accuracy is not a good measure for imbalanced classification problems. 1 - ACC results in the misclassification error or error rate.
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/Accuracy.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/Accuracy.png)
 
 #### Balanced Accuracy
 
 on the other hand, gives equal weight to the relative proportions of negative and positive class instances. If a model predicts only one class, the best balanced accuracy it could receive is 50%. 1 - BAC results in the balanced error rate.
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/BalancedAccuracy.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/BalancedAccuracy.png)
 
 #### F1 Score
 
 is the harmonic mean of precision and recall. A perfect model has a precision and recall of 1 resulting in an F1 score of 1. For all other models, there exists a tradeoff between precision and recall. F1 is a measure that helps us to judge how much of the tradeoff is worthwhile.
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/F1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/F1.png)
 
 or
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/F1(2).png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/F1(2).png)
 
 Setup
 -----
@@ -158,7 +154,7 @@ logreg_df_4wk = generateThreshVsPerfData(logreg_bchmk,
 plotROCCurves(logreg_df_4wk)
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-6-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-6-1.png)
 
 Looking at the ROC curves, we see that they intersect but otherwise have similar performance. It is important to note, in practice, we choose a threshold to operate a model. Therefore, the model with a larger area may not be the model with better performance within a limited threshold range.
 
@@ -168,7 +164,7 @@ Looking at the ROC curves, we see that they intersect but otherwise have similar
 plotROCCurves(logreg_df_4wk, measures = list(tpr, ppv), diagonal = FALSE)
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-7-1.png)
 
 Here, if you are considering AUC-PR, the vanilla logistic regression does better than the SMOTEd model. Another thing to note is that the positive predictive value (precision) is fairly low for both models. Even though the AUC looked decent at 0.83 there is still a lot of imprecision in these models. Otherwise, the SMOTE model generally does better when recall (TPR) is high and vice verse for the vanilla model.
 
@@ -178,7 +174,7 @@ Here, if you are considering AUC-PR, the vanilla logistic regression does better
 plotThreshVsPerf(logreg_df_4wk,  measures = list(fpr, fnr))
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-8-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-8-1.png)
 
 Threshold plots are common visualizations that help determine an appropriate threshold on which to operate. The FPR and FNR clearly illustrate the opposing tradeoff of each model. However it is difficult to compare these models using FPR and FNR since the imbalanced nature of the data has effectively squished the vanilla logistic model to the far left: slope is zero when the threshold is greater than ≈ 0.4.
 
@@ -186,7 +182,7 @@ Threshold plots are common visualizations that help determine an appropriate thr
 plotThreshVsPerf(logreg_df_4wk,  measures = list(f1, bac))
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-9-1.png)
 
 For our use case, threshold plots for F1 score and balanced accuracy make it easier to identify good thresholds. And while the vanilla logistic regression is still squished to the left, we can compare the performance peaks for the models. For F1, the vanilla model tends to have a higher peak. Whereas for balanced accuracy, SMOTE tends to have a slightly higher peak. Notice that the balanced accuracy for the SMOTEd model centers around the default threshold of 0.5 whereas the F1 score does not.
 
@@ -365,7 +361,7 @@ rpart_df_4wk = generateThreshVsPerfData(rpart_bchmk,
 plotROCCurves(rpart_df_4wk)
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-20-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-20-1.png)
 
 It's easy to see that SMOTE has a higher AUC than the vanilla model, but since the lines cross, each perform better within certain operating thresholds.
 
@@ -375,7 +371,7 @@ It's easy to see that SMOTE has a higher AUC than the vanilla model, but since t
 plotROCCurves(rpart_df_4wk, measures = list(tpr, ppv), diagonal = FALSE)
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-21-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-21-1.png)
 
 The vanilla model scores much higher on precision (PPV) but declines much more quickly as recall increases. SMOTE is more precise when recall (TPR) is greater than ≈ 0.75. Additionally, notice the straight lines, likely, there are no data in these regions making each model only viable for half the PR Curve.
 
@@ -385,7 +381,7 @@ The vanilla model scores much higher on precision (PPV) but declines much more q
 plotThreshVsPerf(rpart_df_4wk,  measures = list(fpr, fnr))
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-22-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-22-1.png)
 
 The nearly vertical slopes of these threshold plots represent the straight lines on the PR Curve plot.
 
@@ -393,7 +389,7 @@ The nearly vertical slopes of these threshold plots represent the straight lines
 plotThreshVsPerf(rpart_df_4wk,  measures = list(f1, bac))
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-23-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-23-1.png)
 
 If we're concerned primarily with balanced accuracy, SMOTE is clearly better at all thresholds. For the F1 score however, it depends on the operating threshold of the model. Notice balanced accuracy is once again centered around the default threshold of 0.5 and the F1 measure is not. The F1 performance to threshold pattern is roughly opposite for the two flavors of decision trees.
 
@@ -565,7 +561,7 @@ randomForest_df_4wk = generateThreshVsPerfData(randomForest_bchmk,
 plotROCCurves(randomForest_df_4wk)
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-35-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-35-1.png)
 
 Both models cross multiple times showing either model is likely good for most thresholds.
 
@@ -575,7 +571,7 @@ Both models cross multiple times showing either model is likely good for most th
 plotROCCurves(randomForest_df_4wk, measures = list(tpr, ppv), diagonal = FALSE)
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-36-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-36-1.png)
 
 This PR-Curve shows more distinctly that SMOTE generally performs better when recall is high, whereas the vanilla model generally performs better when recall is lower.
 
@@ -585,13 +581,13 @@ This PR-Curve shows more distinctly that SMOTE generally performs better when re
 plotThreshVsPerf(randomForest_df_4wk,  measures = list(fpr, fnr))
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-37-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-37-1.png)
 
 ``` r
 plotThreshVsPerf(randomForest_df_4wk,  measures = list(f1, bac))
 ```
 
-![](/assets/VanillaVsSMOTE_files/figure-markdown_github/unnamed-chunk-38-1.png)
+![]({{ site.baseurl }}/images/VanillaVsSMOTE_files/unnamed-chunk-38-1.png)
 
 Interestingly, the SMOTE randomForest does not center balanced accuracy around the default threshold; rather F1 is centered on the 0.5 threshold. Otherwise we see that SMOTE produces a higher peak for balanced accuracy but lower for F1. Additionally, the vanilla model is still squished to the left due to its class imbalance.
 

@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html</loc>
+<lastmod>2018-05-15T00:00:00-05:00</lastmod>
+</url>
+<url>
+<loc>https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/16/Vanilla-vs-SMOTE.html</loc>
+<lastmod>2018-05-16T00:00:00-05:00</lastmod>
+</url>
+<url>
 <loc>https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html</loc>
 <lastmod>2018-07-15T00:00:00-05:00</lastmod>
 </url>
 <url>
 <loc>https://patdmob.github.io/blog/blog/bat%20files/automation/windows/2018/12/15/Taking-a-bat-to-scripts.html</loc>
 <lastmod>2018-12-15T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://patdmob.github.io/blog/markdown/2020/01/14/test-markdown-post.html</loc>
-<lastmod>2020-01-14T00:00:00-06:00</lastmod>
-</url>
-<url>
-<loc>https://patdmob.github.io/blog/jupyter/2020/02/20/test.html</loc>
-<lastmod>2020-02-20T00:00:00-06:00</lastmod>
 </url>
 <url>
 <loc>https://patdmob.github.io/blog/about/</loc>
@@ -27,13 +27,5 @@
 </url>
 <url>
 <loc>https://patdmob.github.io/blog/categories/</loc>
-</url>
-<url>
-<loc>https://patdmob.github.io/blog/images/Missing_Data_Document_files/figure-latex/unnamed-chunk-4-1.pdf</loc>
-<lastmod>2021-02-07T22:03:40-06:00</lastmod>
-</url>
-<url>
-<loc>https://patdmob.github.io/blog/images/Missing_Data_Document_files/figure-latex/unnamed-chunk-5-1.pdf</loc>
-<lastmod>2021-02-07T22:03:40-06:00</lastmod>
 </url>
 </urlset>

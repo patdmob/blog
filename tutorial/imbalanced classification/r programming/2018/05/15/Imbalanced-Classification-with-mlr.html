@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Imbalanced Classification with mlr | Patrick D Mobley</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Imbalanced Classification with mlr" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="This notebook is a tutorial on using mlr to solve an imbalanced data problem: predicting employee attrition." />
+<meta property="og:description" content="This notebook is a tutorial on using mlr to solve an imbalanced data problem: predicting employee attrition." />
+<link rel="canonical" href="https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html" />
+<meta property="og:url" content="https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html" />
+<meta property="og:site_name" content="Patrick D Mobley" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-05-15T00:00:00-05:00" />
+<script type="application/ld+json">
+{"url":"https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html","@type":"BlogPosting","headline":"Imbalanced Classification with mlr","dateModified":"2018-05-15T00:00:00-05:00","datePublished":"2018-05-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html"},"description":"This notebook is a tutorial on using mlr to solve an imbalanced data problem: predicting employee attrition.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://patdmob.github.io/blog/feed.xml" title="Patrick D Mobley" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">Patrick D Mobley</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Imbalanced Classification with mlr</h1><p class="page-description">This notebook is a tutorial on using <em>mlr</em> to solve an imbalanced data problem: predicting employee attrition.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2018-05-15T00:00:00-05:00" itemprop="datePublished">
+        May 15, 2018
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      12 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#tutorial">tutorial</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#imbalanced classification">imbalanced classification</a>
+        &nbsp;
+      
+        <a class="category-tags-link" href="/blog/categories/#R programming">R programming</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="outline">Outline</h2>
+
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#data">Data</a></li>
+  <li><a href="#model-development">Model Development</a>
+    <ul>
+      <li><a href="#model-setup">Model Setup</a></li>
+      <li><a href="#tune-hyperparameters">Tune Hyperparameters</a></li>
+      <li><a href="#measuring-performance">Measuring Performance</a></li>
+    </ul>
+  </li>
+  <li><a href="#results">Results</a></li>
+  <li><a href="#interpretability">Interpretability</a></li>
+  <li><a href="#production-model">Production Model</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<h3 id="background">Background</h3>
+
+<p>This notebook presents a reference implementation of an imbalanced data problem, namely predicting employee attrition. We’ll use <a href="https://mlr-org.github.io/mlr/index.html"><code class="language-plaintext highlighter-rouge">mlr</code></a>, a package designed to provide an infrastructure for Machine Learning in R. Additionally, there is a <a href="../16/Vanilla-vs-SMOTE.html">companion post</a> which investigates the effectiveness of SMOTE compared to non-SMOTE models.</p>
+
+<p>Unfortunately, the data is proprietary and we cannot disclose the details of the data with outside parties. But the field represented by this data sees 20% annual turnover in employees. Each employee separation costs roughly $20K. Meaning, a 25% reduction to employee attrition results in an annual savings of over $400K.</p>
+
+<p>Using a predictive model, HR organizations can build on the data of today to anticipate the events of tomorrow. This forward notice offers the opportunity to respond by developing a tailored retention strategy to retain employees before they jump ship.</p>
+
+<p>This work was part of a one month PoC for an Employee Attrition Analytics project at Honeywell International. I presented this notebook at a Honeywell internal data science meetup group and received permission to post it publicly. I would like to thank Matt Pettis (Managing Data Scientist), Nabil Ahmed (Solution Architect), Kartik Raval (Data SME), and Jason Fraklin (Business SME). Without their mentorship and contributions, this project would not have been possible.</p>
+
+<h3 id="setup">Setup</h3>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Libraries</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span><span class="w">    </span><span class="c1"># Data manipulation</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">mlr</span><span class="p">)</span><span class="w">          </span><span class="c1"># Modeling framework</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">parallelMap</span><span class="p">)</span><span class="w">  </span><span class="c1"># Parallelization</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">rpart.plot</span><span class="p">)</span><span class="w">   </span><span class="c1"># Decision Tree Visualization</span><span class="w">
+</span><span class="n">library</span><span class="p">(</span><span class="n">parallel</span><span class="p">)</span><span class="w">     </span><span class="c1"># To detect # of cores</span><span class="w">
+
+</span><span class="c1"># Parallelization</span><span class="w">
+</span><span class="n">parallelStartSocket</span><span class="p">(</span><span class="n">detectCores</span><span class="p">())</span><span class="w">
+
+</span><span class="c1"># Loading Data</span><span class="w">
+</span><span class="n">source</span><span class="p">(</span><span class="s2">"prep_EmployeeAttrition.R"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<h3 id="data">Data</h3>
+
+<p>Since the primary purpose of this notebook is modeling employee attrition, we won’t go into the data preprocessing steps; but they involved sql querying, reformatting, cleaning, filtering, and variable creation.</p>
+
+<p>The loaded data represents a snapshot in time, aggregating 52-weeks of history into performance and summary metrics. To build a predictive model, we choose the end of this 52-week period to be at least 4 weeks in the past. Finally we created a variable indicating if an employee left in the following four week period.</p>
+
+<p>To get summary statistics within <code class="language-plaintext highlighter-rouge">mlr</code>, you can use <code class="language-plaintext highlighter-rouge">summarizeColumns()</code>:</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">summarizeColumns</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><em>Output not shown for proprietary reasons.</em></p>
+
+<h4 id="data-structure">Data Structure</h4>
+
+<p>Employees: 2852 <br /> Model Features: 15 <br /> Target Variable: <em>Left4wk</em> <br /></p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w">
+  </span><span class="n">summarise</span><span class="p">(</span><span class="n">`Total Employees`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="p">(),</span><span class="w">
+            </span><span class="n">`Attrition Count`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">sum</span><span class="p">(</span><span class="n">Left4wk</span><span class="o">==</span><span class="s2">"Left"</span><span class="p">),</span><span class="w">
+            </span><span class="n">`Attrition Percent`</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">Left4wk</span><span class="o">==</span><span class="s2">"Left"</span><span class="p">))</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">knitr</span><span class="o">::</span><span class="n">kable</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right">Total Employees</th>
+      <th style="text-align: right">Attrition Count</th>
+      <th style="text-align: right">Attrition Percent</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right">2852</td>
+      <td style="text-align: right">201</td>
+      <td style="text-align: right">0.0704769</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="considerations">Considerations</h4>
+
+<p><strong>Concern:</strong> Employee attrition is a imbalanced classification problem, meaning that the group of interest is relatively rare. This can cause models to overclassify the majority group in an effort to get better accuracy. After all, if predict every employee will stay, we can get an accuracy of 93%, but this is not a useful model. <br /> <strong>Solution:</strong> There are two general methods to overcome this issue: sampling techniques and skew-insensitive classifiers. Synthetic Minority Oversampling TEchnique (SMOTE) is a sampling technique well suited for employee attrition. We’ll use this method to create a balanced model for predicting employee attrition.</p>
+
+<h2 id="model-development">Model Development</h2>
+
+<p>We’ll use <code class="language-plaintext highlighter-rouge">mlr</code> to help us setup the models, run cross-validation, perform hyperparameter tuning, and measure performance of the final models.</p>
+
+<h3 id="model-setup">Model Setup</h3>
+
+<h4 id="defining-the-task">Defining the Task</h4>
+
+<p>Just as <code class="language-plaintext highlighter-rouge">dplyr</code> provides a grammar for manipulating data frames, <code class="language-plaintext highlighter-rouge">mlr</code> provides a grammar for data modeling. The first grammatical object is the <em>task</em>. A <em>task</em> is an object that defines at minimum the data and the target.</p>
+
+<p>For this project, our task is to predict employee attrition 4 weeks out. Here we also create a holdout test and train dataset for each task.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Defining Task</span><span class="w">
+</span><span class="n">tsk_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeClassifTask</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"4 week prediction"</span><span class="p">,</span><span class="w">
+                       </span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="nf">c</span><span class="p">(</span><span class="o">!!</span><span class="w"> </span><span class="n">exclude</span><span class="p">)),</span><span class="w">
+                       </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Left4wk"</span><span class="p">,</span><span class="w">  </span><span class="c1"># Must be a factor variable</span><span class="w">
+                       </span><span class="n">positive</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"Left"</span><span class="w">
+                       </span><span class="p">)</span><span class="w">
+</span><span class="n">tsk_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mergeSmallFactorLevels</span><span class="p">(</span><span class="n">tsk_4wk</span><span class="p">)</span><span class="w">
+
+</span><span class="c1"># Creating 4 week holdout datasets</span><span class="w">
+</span><span class="n">ho_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeResampleInstance</span><span class="p">(</span><span class="s2">"Holdout"</span><span class="p">,</span><span class="w"> </span><span class="n">tsk_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">stratify</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">   </span><span class="c1"># Default 1/3rd</span><span class="w">
+</span><span class="n">tsk_train_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subsetTask</span><span class="p">(</span><span class="n">tsk_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">ho_4wk</span><span class="o">$</span><span class="n">train.inds</span><span class="p">[[</span><span class="m">1</span><span class="p">]])</span><span class="w">
+</span><span class="n">tsk_test_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">subsetTask</span><span class="p">(</span><span class="n">tsk_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">ho_4wk</span><span class="o">$</span><span class="n">test.inds</span><span class="p">[[</span><span class="m">1</span><span class="p">]])</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Note that the target variable needs to be a factor variable. For Python users, a factor variable is a data type within R specific for representing categorical variables. It can represent information as ordered (e.g. small, medium, large) or unordered (e.g. red, green, blue) and models can take advantage of these relationships. Variables in this dataset were reformatted to factor as part of the preprocessing.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_target</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">table</span><span class="p">(</span><span class="n">getTaskTargets</span><span class="p">(</span><span class="n">tsk_train_4wk</span><span class="p">))</span><span class="w">
+</span><span class="n">train_target</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  Left Stayed
+   134   1767
+</code></pre></div></div>
+
+<p>Again, we are dealing with an imbalanced classification problem. After splitting the data, our training sample has 134 employees that left out of 1901 total employees.</p>
+
+<p>We’ll use the SMOTE technique described earlier to synthetically generate more employees that left. This will result in a more balanced dataset for training. However, since the test set is still imbalanced, we need to consider balanced performance measures like balanced accuracy and F1 when evaluating and tuning our models.</p>
+
+<h4 id="defining-the-learners">Defining the Learners</h4>
+
+<p>Next, we’ll use three different models to predict employee attrition. The advantage of this approach is that some models perform better on certain problems. By using a few different models were more likely to use a good model for this problem. Also, while some models might provide a better answer, they can be more difficult to explain how or why they work. By using multiple models, we should be able to provide both a predictive and explainable answer. The best of both worlds.</p>
+
+<p>Here we define the three models we will use to predict employee attrition. Notice they are wrapped in a SMOTE function.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">lrns</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="w">
+  </span><span class="n">makeSMOTEWrapper</span><span class="p">(</span><span class="n">makeLearner</span><span class="p">(</span><span class="s2">"classif.logreg"</span><span class="p">,</span><span class="w"> </span><span class="n">predict.type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"prob"</span><span class="p">),</span><span class="w">
+                   </span><span class="n">sw.rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">18</span><span class="p">,</span><span class="w"> </span><span class="n">sw.nn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8</span><span class="p">),</span><span class="w">
+  </span><span class="n">makeSMOTEWrapper</span><span class="p">(</span><span class="n">makeLearner</span><span class="p">(</span><span class="s2">"classif.rpart"</span><span class="p">,</span><span class="w"> </span><span class="n">predict.type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"prob"</span><span class="p">),</span><span class="w">
+                   </span><span class="n">sw.rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">18</span><span class="p">,</span><span class="w"> </span><span class="n">sw.nn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8</span><span class="p">),</span><span class="w">
+  </span><span class="n">makeSMOTEWrapper</span><span class="p">(</span><span class="n">makeLearner</span><span class="p">(</span><span class="s2">"classif.randomForest"</span><span class="p">,</span><span class="w"> </span><span class="n">predict.type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"prob"</span><span class="p">),</span><span class="w">
+                   </span><span class="n">sw.rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">18</span><span class="p">,</span><span class="w"> </span><span class="n">sw.nn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<h4 id="pause-lets-review-the-process-flow">Pause: Let’s review the process flow</h4>
+
+<p><img src="/blog/images/Imbalanced_Classification_with_mlr_files/Employee%20Attrition%20Model.png" alt="" /></p>
+
+<p>The order of operations is important. If you SMOTE before splitting the data, then you’ve effectively polluted the training set with information from the test set! <code class="language-plaintext highlighter-rouge">mlr</code> has a <code class="language-plaintext highlighter-rouge">smote()</code> function, but that works by redefining the task and will happen before the resampling split. Therefore, we wrapped the smote around the learner which is applied after the resampling split.</p>
+
+<h4 id="defining-the-resampling-strategy">Defining the Resampling Strategy</h4>
+
+<p>To ensure extensible models to new data, we’ll use cross-validation to guard against overfitting.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">folds</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">20</span><span class="w">
+</span><span class="n">rdesc</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeResampleDesc</span><span class="p">(</span><span class="s2">"CV"</span><span class="p">,</span><span class="w"> </span><span class="n">iters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">folds</span><span class="p">,</span><span class="w"> </span><span class="n">stratify</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w"> </span><span class="c1"># stratification with respect to the target</span><span class="w">
+</span></code></pre></div></div>
+
+<p>We use 20 folds here, but I’d recommend fewer during the exploratory phase since more folds require more computation.</p>
+
+<h4 id="model-cross-validation">Model Cross-validation</h4>
+
+<p>Let’s run a quick cross-validation iteration to see how the models perform before tuning them.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bchmk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">benchmark</span><span class="p">(</span><span class="n">lrns</span><span class="p">,</span><span class="w">
+                  </span><span class="n">tsk_train_4wk</span><span class="p">,</span><span class="w">
+                  </span><span class="n">rdesc</span><span class="p">,</span><span class="w"> </span><span class="n">show.info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span><span class="w">
+                  </span><span class="n">measures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span><span class="w"> </span><span class="n">bac</span><span class="p">,</span><span class="w"> </span><span class="n">auc</span><span class="p">,</span><span class="w"> </span><span class="n">f1</span><span class="p">))</span><span class="w">
+</span><span class="n">bchmk_perf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">getBMRAggrPerformances</span><span class="p">(</span><span class="n">bchmk</span><span class="p">,</span><span class="w"> </span><span class="n">as.df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span><span class="n">bchmk_perf</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="n">task.id</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">knitr</span><span class="o">::</span><span class="n">kable</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">learner.id</th>
+      <th style="text-align: right">acc.test.mean</th>
+      <th style="text-align: right">bac.test.mean</th>
+      <th style="text-align: right">auc.test.mean</th>
+      <th style="text-align: right">f1.test.mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">classif.logreg.smoted</td>
+      <td style="text-align: right">0.6500867</td>
+      <td style="text-align: right">0.7478255</td>
+      <td style="text-align: right">0.7899618</td>
+      <td style="text-align: right">0.2610063</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">classif.rpart.smoted</td>
+      <td style="text-align: right">0.7428074</td>
+      <td style="text-align: right">0.7618259</td>
+      <td style="text-align: right">0.8358594</td>
+      <td style="text-align: right">0.3027377</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">classif.randomForest.smoted</td>
+      <td style="text-align: right">0.8695530</td>
+      <td style="text-align: right">0.7185079</td>
+      <td style="text-align: right">0.8700374</td>
+      <td style="text-align: right">0.3754485</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Not bad; the best model has an accuracy of 87%. By looking at different, sometimes competing, measures we can better gauge the performance of the models. Above we’ve computed accuracy, balanced accuracy, AUC, and F1.</p>
+
+<p>Shown below are boxplots showing the performance measure distribution for each of the 20 cross-validation iterations. All the models seem to perform reasonably well when applied to new data.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plotBMRBoxplots</span><span class="p">(</span><span class="n">bchmk</span><span class="p">,</span><span class="w"> </span><span class="n">measure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acc</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/blog/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-8-1.png" alt="" /></p>
+
+<p>However when we look at balanced accuracy, we see a performance drop. Balanced accuracy gives equal weight to the relative proportion of each class (left vs stayed) resulting in a more difficult metric.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plotBMRBoxplots</span><span class="p">(</span><span class="n">bchmk</span><span class="p">,</span><span class="w"> </span><span class="n">measure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bac</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/blog/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-9-1.png" alt="" /></p>
+
+<p>With this we’ve built some models, but now we need to refine them. Let’s see if we can improve performance by tuning the hyperparameters.</p>
+
+<h3 id="tune-hyperparameters">Tune Hyperparameters</h3>
+
+<p>Tuning works by optimizing the cross-validated aggregated performance metric like accuracy or balanced accuracy. This mitigates overfitting because each fold needs to perform reasonable well as to not pull down the aggregation. For this imbalanced data problem, we’ll tune using both F1 score and balanced accuracy.</p>
+
+<p>The SMOTE algorithm is defined by the parameters <em>rate</em> and <em>nearest neighbors</em>. <em>Rate</em> defines how much to oversample the minority class. <em>Nearest neighbors</em> defines how many nearest neighbors to consider. For more information about this algorithm check out <a href="https://limnu.com/smote-visualization-for-data-science/">this post</a> and the <a href="https://arxiv.org/abs/1106.1813">original paper</a>. Since SMOTE has tunable hyperparameters, we’ll tune the logistic regression too. In addition, decision trees and randomForests have model specific hyperparameters. If you’re unsure what hyperparameters are tunable, us <code class="language-plaintext highlighter-rouge">getParamSet(&lt;learner&gt;)</code> to find out.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Logistic</span><span class="w">
+</span><span class="n">logreg_ps</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeParamSet</span><span class="p">(</span><span class="w">
+              </span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"sw.rate"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">28L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"sw.nn"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8L</span><span class="p">)</span><span class="w">
+              </span><span class="p">)</span><span class="w">
+</span><span class="c1"># DecisionTree</span><span class="w">
+</span><span class="n">rpart_ps</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeParamSet</span><span class="p">(</span><span class="w">
+              </span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"sw.rate"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">28L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"sw.nn"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"minsplit"</span><span class="p">,</span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">10L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">50L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"minbucket"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">70L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeNumericParam</span><span class="p">(</span><span class="s2">"cp"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.005</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">.05</span><span class="p">)</span><span class="w">
+              </span><span class="p">)</span><span class="w">
+</span><span class="c1"># RandomForest</span><span class="w">
+</span><span class="n">randomForest_ps</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeParamSet</span><span class="p">(</span><span class="w">
+              </span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"sw.rate"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">28L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"sw.nn"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">8L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"ntree"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">50L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">600L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"mtry"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">20L</span><span class="p">)</span><span class="w">
+              </span><span class="p">,</span><span class="n">makeIntegerParam</span><span class="p">(</span><span class="s2">"nodesize"</span><span class="p">,</span><span class="w"> </span><span class="n">lower</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">4L</span><span class="p">,</span><span class="w"> </span><span class="n">upper</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">50L</span><span class="p">)</span><span class="w">
+              </span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After defining the bounds of each hyperparameter, we define the tuning control to intelligently search the space for an optimal hyperparameter set. <a href="http://iridia.ulb.ac.be/irace/">Irace</a> and <a href="http://mlr-org.github.io/mlrMBO/">MBO</a> are different methods for optimizing hyperparameters. After tuning each model, we update the learner with the optimal configuration for future training.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># ctrl = makeTuneControlMBO(budget=200)</span><span class="w">
+</span><span class="n">ctrl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeTuneControlIrace</span><span class="p">(</span><span class="n">maxExperiments</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">400L</span><span class="p">)</span><span class="w">
+</span><span class="n">logreg_tr</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tuneParams</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="w"> </span><span class="n">tsk_train_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">rdesc</span><span class="p">,</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">f1</span><span class="p">),</span><span class="w"> </span><span class="n">logreg_ps</span><span class="p">,</span><span class="w"> </span><span class="n">ctrl</span><span class="p">)</span><span class="w">
+</span><span class="n">lrns</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">setHyperPars</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">1</span><span class="p">]],</span><span class="w"> </span><span class="n">par.vals</span><span class="o">=</span><span class="n">logreg_tr</span><span class="o">$</span><span class="n">x</span><span class="p">)</span><span class="w">
+
+</span><span class="n">rpart_tr</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tuneParams</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">2</span><span class="p">]],</span><span class="w"> </span><span class="n">tsk_train_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">rdesc</span><span class="p">,</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">f1</span><span class="p">),</span><span class="w"> </span><span class="n">rpart_ps</span><span class="p">,</span><span class="w"> </span><span class="n">ctrl</span><span class="p">)</span><span class="w">
+</span><span class="n">lrns</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">setHyperPars</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">2</span><span class="p">]],</span><span class="w"> </span><span class="n">par.vals</span><span class="o">=</span><span class="n">rpart_tr</span><span class="o">$</span><span class="n">x</span><span class="p">)</span><span class="w">
+
+</span><span class="n">randomForest_tr</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">tuneParams</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">3</span><span class="p">]],</span><span class="w"> </span><span class="n">tsk_train_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">rdesc</span><span class="p">,</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">f1</span><span class="p">),</span><span class="w"> </span><span class="n">randomForest_ps</span><span class="p">,</span><span class="w"> </span><span class="n">ctrl</span><span class="p">)</span><span class="w">
+</span><span class="n">lrns</span><span class="p">[[</span><span class="m">3</span><span class="p">]]</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">setHyperPars</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">3</span><span class="p">]],</span><span class="w"> </span><span class="n">par.vals</span><span class="o">=</span><span class="n">randomForest_tr</span><span class="o">$</span><span class="n">x</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>It’s important to know that for each iteration of the tuning process, a full cross-validation resampling of 20 folds occurs.</p>
+
+<h3 id="measuring-performance">Measuring Performance</h3>
+
+<p>Now that we’ve tuned our hyperparameters, we need to train on all training data and assess model performance against the holdout. This will give us some idea how the model will perform on new data.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">bchmk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">benchmark</span><span class="p">(</span><span class="n">lrns</span><span class="p">,</span><span class="w">
+                  </span><span class="n">tsk_4wk</span><span class="p">,</span><span class="w">
+                  </span><span class="n">ho_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">show.info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span><span class="w">
+                  </span><span class="n">measures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span><span class="w"> </span><span class="n">bac</span><span class="p">,</span><span class="w"> </span><span class="n">auc</span><span class="p">,</span><span class="w"> </span><span class="n">f1</span><span class="p">))</span><span class="w">
+</span><span class="n">bchmk_perf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">getBMRAggrPerformances</span><span class="p">(</span><span class="n">bchmk</span><span class="p">,</span><span class="w"> </span><span class="n">as.df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span><span class="n">bchmk_perf</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">select</span><span class="p">(</span><span class="o">-</span><span class="n">task.id</span><span class="p">)</span><span class="w"> </span><span class="o">%&gt;%</span><span class="w"> </span><span class="n">knitr</span><span class="o">::</span><span class="n">kable</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">learner.id</th>
+      <th style="text-align: right">acc.test.mean</th>
+      <th style="text-align: right">bac.test.mean</th>
+      <th style="text-align: right">auc.test.mean</th>
+      <th style="text-align: right">f1.test.mean</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">classif.logreg.smoted</td>
+      <td style="text-align: right">0.7108307</td>
+      <td style="text-align: right">0.8099716</td>
+      <td style="text-align: right">0.8424056</td>
+      <td style="text-align: right">0.3107769</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">classif.rpart.smoted</td>
+      <td style="text-align: right">0.8422713</td>
+      <td style="text-align: right">0.7220403</td>
+      <td style="text-align: right">0.7973847</td>
+      <td style="text-align: right">0.3421053</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">classif.randomForest.smoted</td>
+      <td style="text-align: right">0.8811777</td>
+      <td style="text-align: right">0.7636591</td>
+      <td style="text-align: right">0.9047494</td>
+      <td style="text-align: right">0.4263959</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>One advantage of using <code class="language-plaintext highlighter-rouge">mlr</code>’s <code class="language-plaintext highlighter-rouge">benchmark()</code> function is that we can create easy comparisons between the three models. Here is the traditional Area Under the Curve (ROC) visualizing one measure of classification performance. The model performs better as the curve stretches towards the upper left thereby maximizing the area.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">generateThreshVsPerfData</span><span class="p">(</span><span class="n">bchmk</span><span class="p">,</span><span class="w">
+            </span><span class="n">measures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span><span class="w"> </span><span class="n">tpr</span><span class="p">,</span><span class="w"> </span><span class="n">mmce</span><span class="p">,</span><span class="w"> </span><span class="n">ppv</span><span class="p">,</span><span class="w"> </span><span class="n">tnr</span><span class="p">,</span><span class="w"> </span><span class="n">fnr</span><span class="p">),</span><span class="w">
+            </span><span class="n">task.id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">'4 week prediction'</span><span class="p">)</span><span class="w">
+</span><span class="n">plotROCCurves</span><span class="p">(</span><span class="n">df_4wk</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Four week attrition model ROC curves"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/blog/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-12-1.png" alt="" /></p>
+
+<p>Right now, we are testing the model against the holdout. But after we finish modeling, we’ll train a model using all the data. To understand how well the model integrates new data, we’ll create the learning curve for various measures of performance.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rs_cv5</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">makeResampleDesc</span><span class="p">(</span><span class="s2">"CV"</span><span class="p">,</span><span class="w"> </span><span class="n">iters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="n">stratify</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span><span class="w">
+</span><span class="n">lc_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">generateLearningCurveData</span><span class="p">(</span><span class="n">learners</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lrns</span><span class="p">,</span><span class="w">
+                               </span><span class="n">task</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tsk_4wk</span><span class="p">,</span><span class="w">
+                               </span><span class="n">percs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">seq</span><span class="p">(</span><span class="m">0.2</span><span class="p">,</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0.2</span><span class="p">),</span><span class="w">
+                               </span><span class="n">measures</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span><span class="w"> </span><span class="n">bac</span><span class="p">,</span><span class="w"> </span><span class="n">auc</span><span class="p">,</span><span class="w"> </span><span class="n">f1</span><span class="p">),</span><span class="w">
+                               </span><span class="n">resampling</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs_cv5</span><span class="p">,</span><span class="w">
+                               </span><span class="n">stratify</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w">
+                               </span><span class="n">show.info</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plotLearningCurve</span><span class="p">(</span><span class="n">lc_4wk</span><span class="p">,</span><span class="w"> </span><span class="n">facet.wrap.ncol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w">
+  </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Four week prediction learning curve"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><img src="/blog/images/Imbalanced_Classification_with_mlr_files/unnamed-chunk-14-1.png" alt="" /></p>
+
+<p>These plots show that the model may benefit from additional data but with decreasing marginal gains. If we want better performance, more data will only help so much–we’ll need better features.</p>
+
+<h2 id="results">Results</h2>
+
+<h3 id="confusion-matrices">Confusion Matrices</h3>
+
+<h4 id="logistic">Logistic</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        predicted
+true     Left Stayed -err.-
+  Left     58      9      9
+  Stayed  261    623    261
+  -err.-  261      9    270
+
+      acc       bac        f1
+0.7160883 0.7852114 0.3005181
+</code></pre></div></div>
+
+<h4 id="decision-tree">Decision Tree</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        predicted
+true     Left Stayed -err.-
+  Left     39     28     28
+  Stayed  122    762    122
+  -err.-  122     28    150
+
+      acc       bac        f1
+0.8422713 0.7220403 0.3421053
+</code></pre></div></div>
+
+<h4 id="randomforest">randomForest</h4>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        predicted
+true     Left Stayed -err.-
+  Left     42     25     25
+  Stayed   83    801     83
+  -err.-   83     25    108
+
+      acc       bac        f1
+0.8864353 0.7664871 0.4375000
+</code></pre></div></div>
+
+<p>These results were computed by running each model on the holdout dataset to simulate new data. Therefore, we should expect similar outcomes from a live implemented production model. Since the randomForest performed the best, we’ll use this model to train our production model but we could also create an ensemble using all three.</p>
+
+<h2 id="interpretability">Interpretability</h2>
+
+<p>There are many ways to extract information from the results of a predictive model which could be valuable to the business. One simple way is to simply use the coefficients from the logistic regression to show any linear trends.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">summary</span><span class="p">(</span><span class="n">getLearnerModel</span><span class="p">(</span><span class="n">mdl_4wk_logistic</span><span class="p">,</span><span class="w"> </span><span class="n">more.unwrap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">))</span><span class="w">
+</span></code></pre></div></div>
+
+<p><em>Output not shown for proprietary reasons.</em></p>
+
+<p>We can also use a decision tree to visualize how the model works and potential reasons why people leave.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rpart.plot</span><span class="p">(</span><span class="n">getLearnerModel</span><span class="p">(</span><span class="n">mdl_4wk_decisionTree</span><span class="p">,</span><span class="w"> </span><span class="n">more.unwrap</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">),</span><span class="w">
+                       </span><span class="n">extra</span><span class="o">=</span><span class="m">104</span><span class="p">,</span><span class="w">
+                       </span><span class="n">box.palette</span><span class="o">=</span><span class="s2">"RdGy"</span><span class="p">,</span><span class="w">
+                       </span><span class="n">branch.lty</span><span class="o">=</span><span class="m">3</span><span class="p">,</span><span class="w">
+                       </span><span class="n">shadow.col</span><span class="o">=</span><span class="s2">"gray"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><em>Output not shown for proprietary reasons.</em></p>
+
+<p>Feature importance plots can also provide valuable insight into how models work. The following code uses a method called permutation feature importance which measures the impact of randomly shuffling the values of a feature.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">impt_4wk</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">generateFilterValuesData</span><span class="p">(</span><span class="n">tsk_4wk</span><span class="p">,</span><span class="w">
+                                     </span><span class="n">method</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"permutation.importance"</span><span class="p">,</span><span class="w">
+                                     </span><span class="n">imp.learner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lrns</span><span class="p">[[</span><span class="m">3</span><span class="p">]],</span><span class="w"> </span><span class="n">measure</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mmce</span><span class="p">)</span><span class="w">
+
+</span><span class="n">plotFilterValues</span><span class="p">(</span><span class="n">impt_4wk</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ggtitle</span><span class="p">(</span><span class="s2">"Feature Importance: 4 Week Prediction"</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p><em>Output not shown for proprietary reasons.</em></p>
+
+<p>Many other methods exist to gain interpretability from blackbox models. A few such methods are <a href="https://arxiv.org/abs/1705.07874">SHAP</a> and <a href="https://arxiv.org/abs/1602.04938">LIME</a>. Additionally, we can feed the results of these models into a clustering algorithm to group similar types of attrition. If distinct groups emerge, we can create profiles and describe what defines each group.</p>
+
+<h2 id="production-model">Production Model</h2>
+
+<p>Finally, we train on all the data to get a model to use on real world data.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mdl_4wk_final</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">train</span><span class="p">(</span><span class="n">lrns</span><span class="p">[[</span><span class="m">3</span><span class="p">]],</span><span class="w"> </span><span class="n">tsk_4wk</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>If we were to deploy this model, we’d continue by setting up a model monitoring framework. Part of this consists of tests to alert on changes to:</p>
+
+<ul>
+  <li>Data
+    <ul>
+      <li>Continues to flow properly (both input and output)</li>
+      <li>Inputs are statistically similar to training data</li>
+    </ul>
+  </li>
+  <li>Model
+    <ul>
+      <li>Performance</li>
+      <li>Computational load (i.e. is the model taking too long to run for the service?)</li>
+    </ul>
+  </li>
+</ul>
+
+<p>For a more detailed list of tests for machine learning production systems, check out the paper by Google researchers, “<a href="https://www.eecs.tufts.edu/~dsculley/papers/ml_test_score.pdf">What’s your ML Test Score? A rubric for ML production systems</a>”.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">parallelStop</span><span class="p">()</span><span class="w">
+</span></code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Stopped parallelization. All cleaned up.
+</code></pre></div></div>
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="patdmob/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/patdmob" title="patdmob"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/patrickdmobley" title="patrickdmobley"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/patdmob" title="patdmob"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

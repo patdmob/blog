@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Taking a .bat to scripts | Patrick D Mobley</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Taking a .bat to scripts" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="How to use a .bat file to run files on Windows." />
+<meta property="og:description" content="How to use a .bat file to run files on Windows." />
+<link rel="canonical" href="https://patdmob.github.io/blog/blog/2018/12/15/Taking-a-bat-to-scripts.html" />
+<meta property="og:url" content="https://patdmob.github.io/blog/blog/2018/12/15/Taking-a-bat-to-scripts.html" />
+<meta property="og:site_name" content="Patrick D Mobley" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-12-15T00:00:00-06:00" />
+<script type="application/ld+json">
+{"url":"https://patdmob.github.io/blog/blog/2018/12/15/Taking-a-bat-to-scripts.html","@type":"BlogPosting","headline":"Taking a .bat to scripts","dateModified":"2018-12-15T00:00:00-06:00","datePublished":"2018-12-15T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://patdmob.github.io/blog/blog/2018/12/15/Taking-a-bat-to-scripts.html"},"description":"How to use a .bat file to run files on Windows.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://patdmob.github.io/blog/feed.xml" title="Patrick D Mobley" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">Patrick D Mobley</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Taking a .bat to scripts</h1><p class="page-description">How to use a .bat file to run files on Windows.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2018-12-15T00:00:00-06:00" itemprop="datePublished">
+        Dec 15, 2018
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      2 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/blog/categories/#blog">blog</a>
+        
+      
+      </p>
+    
+
+    </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Let’s suppose that we need to periodically run the same scripts (written in R or Python perhaps), and furthermore we’re using Windows. One of many possible solutions to this problem is to use a .bat file and then use a task scheduler to periodically run those scripts.</p>
+
+<p>But why use a .bat file? If you are automating scripts, then just run the script! In Windows, a .bat file has the advantage of being flexibly executed. I can double click on it, use the cmd prompt, or I can throw it into a task scheduler and it will run. This flexibility is especially useful if you inconsistently execute the script or have not-so-tech-savvy end users.</p>
+
+<p>But with this flexibility does come a challenge. How do .bat files pass absolute/relative paths to internal script calls? To solve this problem, I developed a quick test case to experiment. I wrote my test case in R but could have just as easily written it in Python.</p>
+
+<h2 id="test-case">Test case</h2>
+
+<p>My project directory contains the .bat file and separate folders for data and the R script.</p>
+
+<p>The directory looks like this:</p>
+
+<p><img src="/assets/Taking_a_bat_to_scripts_files/image002.png" alt="" /></p>
+
+<p>In the R script, I reference a file in the data folder.</p>
+
+<div class="language-r highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">test_data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">readRDS</span><span class="p">(</span><span class="s2">"./data/test_data.rds"</span><span class="p">)</span><span class="w">
+
+</span><span class="n">print</span><span class="p">(</span><span class="n">getwd</span><span class="p">())</span><span class="w">
+</span><span class="n">print</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span><span class="w">
+
+</span><span class="n">fileConn</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">file</span><span class="p">(</span><span class="s2">"result.txt"</span><span class="p">)</span><span class="w">
+</span><span class="n">writeLines</span><span class="p">(</span><span class="n">getwd</span><span class="p">(),</span><span class="w"> </span><span class="n">fileConn</span><span class="p">)</span><span class="w">
+</span><span class="n">close</span><span class="p">(</span><span class="n">fileConn</span><span class="p">)</span><span class="w">
+</span></code></pre></div></div>
+
+<p>This code will use a relative path to retrieve data from a separate folder and expects the root path “./” to be the project directory.</p>
+
+<p>I’m not an expert at writing .bat files so I wrote a couple different scenarios to see what would happen. Eventually, I came up with the following code with comments. To the batch file (.bat) experts out there, please let me know if there is a better way.</p>
+
+<div class="language-bat highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@echo <span class="na">off</span>
+<span class="c">REM This is a test to determine the working path </span>
+<span class="c">REM when running RScript in BAT</span>
+<span class="c">REM %CD% gives the path the script was called from</span>
+<span class="c">REM %~dp0 will give the path of the script itself</span>
+
+<span class="nb">echo</span> <span class="kd">Called</span> <span class="nb">path</span>:
+<span class="nb">echo</span> <span class="nv">%CD%</span>
+<span class="nb">echo</span>.
+<span class="nb">echo</span> <span class="kd">Script</span> <span class="nb">path</span>:
+<span class="nb">echo</span> <span class="vm">%~dp0</span>
+<span class="nb">echo</span>.
+
+<span class="nb">pause</span>
+
+<span class="nb">echo</span> <span class="kd">Works</span> <span class="kd">only</span> <span class="k">if</span> <span class="kd">you</span> <span class="nb">run</span> <span class="kd">it</span> <span class="kd">from</span> <span class="kd">the</span> .bat<span class="s1">'s directory:
+Rscript "</span><span class="vm">%~dp0</span><span class="s1">\R\bat_test.R"
+
+echo.
+echo Works even if you run it from another directory:
+cd </span><span class="vm">%~dp0</span><span class="s1">
+Rscript "R\bat_test.R"
+echo.
+
+echo Press enter to close . . . 
+pause &gt;nul
+
+exit
+</span></code></pre></div></div>
+
+<p>Here were my results:</p>
+
+<p><img src="/assets/Taking_a_bat_to_scripts_files/image001.png" alt="" /></p>
+
+<p>As you can see, I called the .bat file from my user profile directory. The first attempt fails but the second is a success. By using this second method, a user can flexibly execute the .bat file by double clicking, navigating from the cmd prompt, or using the task scheduler.</p>
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="patdmob/blog"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/blog/blog/2018/12/15/Taking-a-bat-to-scripts.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p></p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/patdmob" title="patdmob"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://www.linkedin.com/in/patrickdmobley" title="patrickdmobley"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#linkedin"></use></svg></a></li><li><a rel="me" href="https://twitter.com/patdmob" title="patdmob"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

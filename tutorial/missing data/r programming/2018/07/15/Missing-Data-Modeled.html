@@ -8,15 +8,15 @@
 <meta name="generator" content="Jekyll v4.1.1" />
 <meta property="og:title" content="Missing Data Modeled" />
 <meta property="og:locale" content="en_US" />
-<meta name="description" content="Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world." />
-<meta property="og:description" content="Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world." />
+<meta name="description" content="By creating a missing data model, you can understand the underlying assumptions of your data." />
+<meta property="og:description" content="By creating a missing data model, you can understand the underlying assumptions of your data." />
 <link rel="canonical" href="https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html" />
 <meta property="og:url" content="https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html" />
 <meta property="og:site_name" content="Patrick D Mobley" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2018-07-15T00:00:00-05:00" />
 <script type="application/ld+json">
-{"url":"https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html","@type":"BlogPosting","headline":"Missing Data Modeled","dateModified":"2018-07-15T00:00:00-05:00","datePublished":"2018-07-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html"},"description":"Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world.","@context":"https://schema.org"}</script>
+{"url":"https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html","@type":"BlogPosting","headline":"Missing Data Modeled","dateModified":"2018-07-15T00:00:00-05:00","datePublished":"2018-07-15T00:00:00-05:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html"},"description":"By creating a missing data model, you can understand the underlying assumptions of your data.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://patdmob.github.io/blog/feed.xml" title="Patrick D Mobley" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
@@ -71,7 +71,7 @@ window.onload = wrap_img;
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Missing Data Modeled</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2018-07-15T00:00:00-05:00" itemprop="datePublished">
+    <h1 class="post-title p-name" itemprop="name headline">Missing Data Modeled</h1><p class="page-description">By creating a missing data model, you can understand the underlying assumptions of your data.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2018-07-15T00:00:00-05:00" itemprop="datePublished">
         Jul 15, 2018
       </time>
        • <span class="read-time" title="Estimated read time">
@@ -152,13 +152,13 @@ window.onload = wrap_img;
 
 <p>The second way missing data impacts a dataset is through bias. Consider the following chart. In this case, random elements were dropped from the data if petal length was less than 3.0. Perhaps the data collector had an unconscious bias against short petal iris flowers.</p>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-4-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-4-1.png" alt="" /></p>
 
 <p>At first glance, the available case distribution looks similar to the real data. But a common mistake in exploratory data analysis is to consider each variable individually and not compare this to what the model actually uses. If there is a pattern to the missingness, complete-case (only using complete rows) modeling will result in a biased model. At this point we need to ask ourselves why the data is missing. There can be multiple reasons which may require different strategies to address.</p>
 
 <p>If we can successfully rule out any patterns to the missingness, then we can assume it is Missing Completely at Random (MCAR). The following chart shows data that is MCAR.</p>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-5-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-5-1.png" alt="" /></p>
 
 <p>Notice, even though the sample size decreases, the general distribution remains the same. If the data is MCAR, then bias is not a concern; however data is rarely MCAR. Regardless, a good solution for missing data will seek to make bias as small as possible.</p>
 
@@ -206,7 +206,7 @@ window.onload = wrap_img;
     </span><span class="n">labels</span><span class="o">=</span><span class="nf">names</span><span class="p">(</span><span class="n">iris_mis2</span><span class="p">),</span><span class="n">cex.axis</span><span class="o">=</span><span class="m">.8</span><span class="p">,</span><span class="n">gap</span><span class="o">=</span><span class="m">3</span><span class="p">,</span><span class="n">ylab</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s2">"Proportion of Missing Data"</span><span class="p">,</span><span class="s2">"Pattern"</span><span class="p">))</span><span class="w">
 </span></code></pre></div></div>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-6-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-6-1.png" alt="" /></p>
 
 <p>On the left, we have a bar chart showing the proportion of missing data for each variable. And on the right, we have can see the pattern of missingness for each combination of variables. For instance, 75.3% of the data is complete with no missing values.</p>
 
@@ -374,7 +374,7 @@ window.onload = wrap_img;
 
 <p>However, as we can see below, using mean imputation increases the bias making it difficult to identify Setosa, the species with the smallest petal length.</p>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-9-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-9-1.png" alt="" /></p>
 
 <p>For this reason, you should use more advanced methods when dealing with biased missing data. Even unbiased data will benefit depending on your choice of analytic model (decision trees are probably more affected by mean imputation than linear regression).</p>
 
@@ -396,7 +396,7 @@ window.onload = wrap_img;
 
 <p>Here, muliple imputation does a much better job at matching the shape of the original data.</p>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-12-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-12-1.png" alt="" /></p>
 
 <h3 id="example-in-mice">Example in MICE</h3>
 
@@ -410,7 +410,7 @@ window.onload = wrap_img;
 
 <p>It is one of the more complicated methods, however it does a great job of imputing missing variables.</p>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-14-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-14-1.png" alt="" /></p>
 
 <h3 id="example-in-missforest">Example in missForest</h3>
 
@@ -434,7 +434,7 @@ window.onload = wrap_img;
 
 <p>As you can see, it also does quite well.</p>
 
-<p><img src="/assets/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-17-1.png" alt="" /></p>
+<p><img src="/images/Missing_Data_Document_files/figure-markdown_github/unnamed-chunk-17-1.png" alt="" /></p>
 
 <h2 id="conclusion">Conclusion</h2>
 

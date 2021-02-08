@@ -2,8 +2,7 @@
 layout: post
 title: "Taking a .bat to scripts"
 description: How to use a .bat file to run files on Windows.
-categories: [blog]
-tags: [bat files, automation, Windows]
+categories: [blog, bat files, automation, Windows]
 comments: true
 ---
 

@@ -1,11 +1,7 @@
 ---
 layout: post
 title: "Missing Data Modeled"
-categories:
-  - Tutorials
-tags:
-  - missing data
-  - R programming
+categories: [tutorial, missing data, R programming]
 excerpt: Missing data analysis is often overlooked in the data modeling process, yet it is essential for developing high quality models. Before cleaning, nearly every dataset contains missing data. As we prepare the dataset for modeling, we make various assumptions that impact how the production model will interact in the real-world.
 comments: true
 ---

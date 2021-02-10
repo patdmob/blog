@@ -3,8 +3,11 @@ layout: post
 title: "Taking a .bat to scripts"
 description: How to use a .bat file to run files on Windows.
 categories: [blog, bat files, automation, Windows]
+image: images/Taking_a_bat_to_scripts_files/baseballBAT.png
 comments: true
 ---
+
+![]({{ site.baseurl}}/images/Taking_a_bat_to_scripts_files/baseballBAT.png)
 
 Let's suppose that we need to periodically run the same scripts (written in R or Python perhaps), and furthermore we're using Windows. One of many possible solutions to this problem is to use a .bat file and then use a task scheduler to periodically run those scripts. 
 

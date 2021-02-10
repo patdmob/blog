@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/15/Imbalanced-Classification-with-mlr.html</loc>
+<loc>https://patdmob.github.io/blog/tutorial/r%20programming/imbalanced%20classification/2018/05/15/Imbalanced-Classification-with-mlr.html</loc>
 <lastmod>2018-05-15T00:00:00-05:00</lastmod>
 </url>
 <url>
-<loc>https://patdmob.github.io/blog/tutorial/imbalanced%20classification/r%20programming/2018/05/16/Vanilla-vs-SMOTE.html</loc>
+<loc>https://patdmob.github.io/blog/tutorial/r%20programming/imbalanced%20classification/2018/05/16/Vanilla-vs-SMOTE.html</loc>
 <lastmod>2018-05-16T00:00:00-05:00</lastmod>
 </url>
 <url>
-<loc>https://patdmob.github.io/blog/tutorial/missing%20data/r%20programming/2018/07/15/Missing-Data-Modeled.html</loc>
+<loc>https://patdmob.github.io/blog/tutorial/r%20programming/missing%20data/2018/07/15/Missing-Data-Modeled.html</loc>
 <lastmod>2018-07-15T00:00:00-05:00</lastmod>
 </url>
 <url>

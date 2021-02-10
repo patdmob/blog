@@ -2,7 +2,7 @@
 layout: post
 title: "Vanilla vs SMOTE Flavored Imbalanced Classification"
 description: A companion notebook to Imbalanced Classification with mlr, here we compare non-SMOTE and SMOTE modeling using logistic regression, decision trees, and randomForest.
-categories: [tutorial, imbalanced classification, R programming]
+categories: [tutorial, R programming, imbalanced classification]
 comments: true
 ---
 

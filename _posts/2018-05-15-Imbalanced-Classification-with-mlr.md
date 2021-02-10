@@ -2,7 +2,7 @@
 layout: post
 title: "Imbalanced Classification with mlr"
 description: "This notebook is a tutorial on using <em>mlr</em> to solve an imbalanced data problem: predicting employee attrition."
-categories: [tutorial, imbalanced classification, R programming]
+categories: [tutorial, R programming, imbalanced classification]
 comments: true
 ---
 

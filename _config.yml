@@ -68,7 +68,7 @@ show_tags: true
 google_analytics: UA-122946005-1
 
 exclude:
-  - docker-compose.yml
+  - docker-compose.yml 
   - action.yml
   - Makefile
 

@@ -3,8 +3,11 @@ layout: post
 title: "Missing Data Modeled"
 description: By creating a missing data model, you can understand the underlying data assumptions critical to your data science model.
 categories: [tutorial, R programming, missing data]
+image: images/Missing_Data_Document_files/data-2764820_1920.jpg
 comments: true
 ---
+
+![]({{ site.baseurl}}/images/Missing_Data_Document_files/data-2764820_1920.jpg)
 
 Outline
 -------
